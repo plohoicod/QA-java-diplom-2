@@ -1,3 +1,4 @@
+import dto.AuthResponseDto;
 import dto.LoginDto;
 import dto.RegisterDto;
 import dto.UserInfoDto;
@@ -46,7 +47,7 @@ public class AuthClient {
     }
 
     @Step("Отправка PATCH в /api/auth/user без токена")
-    public Response getUserInfoWithoutToken(UserInfoDto dto) {
+    public Response patchUserInfoWithoutToken(UserInfoDto dto) {
         return
                 given()
                         .header("Content-type", "application/json")
@@ -67,6 +68,19 @@ public class AuthClient {
                         .when()
                         .post(AUTH_API + "/login");
 
+    }
+
+    public String getAuthToken(String email, String password) {
+        LoginDto loginDto = new LoginDto(email, password);
+        AuthResponseDto authResponseDto = loginUser(loginDto).as(AuthResponseDto.class);
+
+        return authResponseDto.getAccessToken();
+    }
+
+    public void deleteUser(String email, String password) {
+        String token = getAuthToken(email, password);
+        if (token != null)
+            deleteUser(token);
     }
 
 
